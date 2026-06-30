@@ -1,0 +1,169 @@
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import * as PacePal from "./src/pacepalModel.mjs";
+
+const state = PacePal.createInitialState();
+
+assert.equal(state.activeActivity, "Phone Charm");
+assert.equal(state.activeTab, "tablets");
+assert.equal(state.selectedTableId, 1);
+assert.equal(state.frontStepIndex, 1);
+assert.deepEqual(PacePal.liveTabs, ["tablets", "slide", "help", "review"]);
+assert.deepEqual(Object.values(PacePal.languageLabels), ["English", "中文"]);
+
+assert.equal(state.frontScreen.title, "Phone Charm Workshop");
+assert.match(state.frontScreen.reminder, /string ends even/i);
+assert.match(state.frontScreen.slideImage, /^\/slides\/beads-/);
+assert.ok(existsSync(`public${state.frontScreen.slideImage}`));
+assert.equal(PacePal.frontStep(state).title, "Make a loop");
+assert.equal(PacePal.frontSlideImage(state), "/slides/beads-06.jpg");
+assert.equal(state.tables.length, 3);
+assert.equal(state.tables[0].following, true);
+assert.equal(state.tables[2].following, false);
+
+assert.equal(PacePal.selectedTable(state).name, "Tablet 1");
+assert.equal(PacePal.tableStep(state).title, "Make a loop");
+assert.match(PacePal.tableStep(state).slideImage, /^\/slides\/beads-/);
+assert.ok(existsSync(`public${PacePal.tableStep(state).slideImage}`));
+assert.equal(PacePal.currentInstruction(state), "Make a loop and make sure both ends are equal.");
+
+PacePal.advanceAll(state);
+assert.equal(PacePal.frontStep(state).title, "Wrap around finger");
+assert.equal(PacePal.tableStep(state).title, "Wrap around finger");
+assert.equal(PacePal.tableStep(state, 2).title, "Wrap around finger");
+assert.equal(PacePal.tableStep(state, 3).title, "Pull cotton loop through");
+
+PacePal.catchUpTable(state, 3);
+assert.equal(PacePal.selectedTable(state).id, 1);
+assert.equal(PacePal.tableStep(state, 3).title, "Wrap around finger");
+assert.equal(state.tables[2].following, true);
+
+PacePal.pauseTable(state, 2);
+PacePal.advanceAll(state);
+assert.equal(PacePal.frontStep(state).title, "Pull cotton loop through");
+assert.equal(PacePal.tableStep(state, 1).title, "Pull cotton loop through");
+assert.equal(PacePal.tableStep(state, 2).title, "Wrap around finger");
+
+PacePal.setLanguage(state, "mandarin");
+assert.equal(PacePal.currentInstruction(state), "小心取出圈圈，并把棉线圈穿过去。");
+
+PacePal.selectTable(state, 3);
+assert.equal(PacePal.selectedTable(state).status, "fast");
+assert.equal(PacePal.helpQueue(state).length, 1);
+PacePal.selectNextTable(state);
+assert.equal(PacePal.selectedTable(state).id, 1);
+PacePal.selectPreviousTable(state);
+assert.equal(PacePal.selectedTable(state).id, 3);
+
+PacePal.updateTable(state, 1, "helped");
+assert.equal(PacePal.helpQueue(state).length, 0);
+
+PacePal.addReflection(state, "Tablet screens helped slower seniors stay with the small steps.");
+assert.deepEqual(state.reflections, ["Tablet screens helped slower seniors stay with the small steps."]);
+
+const css = readFileSync("src/styles.css", "utf8");
+const mobileCss = css.slice(css.indexOf("@media (max-width: 900px)"));
+const main = readFileSync("src/main.jsx", "utf8");
+const tablesScreenSource = main.slice(main.indexOf("function TablesScreen"), main.indexOf("function SlideControlScreen"));
+const slideScreenSource = main.slice(main.indexOf("function SlideControlScreen"), main.indexOf("function HelpScreen"));
+
+assert.match(main, /FrontScreenPreview/);
+assert.match(main, /TableTabletGrid/);
+assert.match(main, /PhoneController/);
+assert.match(main, /SlideControlScreen/);
+assert.match(main, /Next all/);
+assert.match(main, /Back all/);
+assert.match(main, /Catch up/);
+assert.match(main, /Following/);
+assert.match(main, /Paused/);
+assert.match(main, /previousTabRef/);
+assert.match(main, /screenPanelRef/);
+assert.match(main, /liveTabs\.indexOf/);
+assert.match(main, /className="screen-panel"/);
+assert.match(main, /gsap\.fromTo\("\.screen-panel"/);
+assert.match(main, /gsap\.from\("\.system-board, \.phone-shell"[\s\S]*?\}, \[\]\);/);
+assert.match(main, /<img/);
+assert.match(main, /front-screen-label/);
+assert.match(main, /tablet-preview-label/);
+assert.match(main, /tablet-slide-card/);
+assert.match(main, /aria-label=\{`\$\{table\.name\} slide preview`\}/);
+assert.match(tablesScreenSource, /follow-list/);
+assert.match(tablesScreenSource, /Front screen follow status/);
+assert.match(tablesScreenSource, /current-step/);
+assert.match(tablesScreenSource, /Slide \{table\.stepIndex \+ 1\}/);
+assert.match(tablesScreenSource, /step\.cue/);
+assert.match(tablesScreenSource, /Last slide/);
+assert.match(tablesScreenSource, /Next slide/);
+assert.match(tablesScreenSource, /Last tablet/);
+assert.match(tablesScreenSource, /Next tablet/);
+assert.match(tablesScreenSource, /selectPreviousTable/);
+assert.match(tablesScreenSource, /selectNextTable/);
+assert.doesNotMatch(tablesScreenSource, /Repeat/);
+assert.doesNotMatch(tablesScreenSource, /Mark stuck/);
+assert.doesNotMatch(tablesScreenSource, /wide-soft/);
+assert.doesNotMatch(tablesScreenSource, /language-pills/);
+assert.doesNotMatch(tablesScreenSource, /setLanguage/);
+assert.doesNotMatch(tablesScreenSource, /<h2>\{step\.title\}<\/h2>/);
+assert.doesNotMatch(tablesScreenSource, /currentInstruction\(state\)/);
+assert.doesNotMatch(tablesScreenSource, /Step \{table\.stepIndex \+ 1\}/);
+assert.doesNotMatch(tablesScreenSource, /Back tablet/);
+assert.doesNotMatch(tablesScreenSource, /screen-title/);
+assert.doesNotMatch(tablesScreenSource, /Choose a tablet/);
+assert.doesNotMatch(tablesScreenSource, /table-card/);
+assert.doesNotMatch(tablesScreenSource, /Tablet follow status/);
+assert.doesNotMatch(slideScreenSource, /follow-list/);
+assert.doesNotMatch(slideScreenSource, /current-step/);
+assert.match(slideScreenSource, /Slide \{state\.frontStepIndex \+ 1\}/);
+assert.doesNotMatch(slideScreenSource, /<h2>\{master\.title\}<\/h2>/);
+assert.doesNotMatch(slideScreenSource, /Step \{state\.frontStepIndex \+ 1\}/);
+assert.doesNotMatch(slideScreenSource, /Back tablet/);
+assert.doesNotMatch(slideScreenSource, /Next tablet/);
+assert.doesNotMatch(main, /front-copy/);
+assert.doesNotMatch(main, /state\.frontScreen\.checkpoint/);
+assert.doesNotMatch(main, /state\.frontScreen\.nextCue/);
+assert.doesNotMatch(main, /side-note/);
+assert.doesNotMatch(main, /Slides stay/);
+assert.doesNotMatch(main, /Table\s+[123]/);
+assert.doesNotMatch(main, />Tables</);
+assert.doesNotMatch(main, /TABLE TABLETS/);
+assert.doesNotMatch(main, /ActivityLibrary/);
+assert.doesNotMatch(main, /AddActivityScreen/);
+assert.doesNotMatch(main, /Hokkien/);
+assert.doesNotMatch(main, /dialect/i);
+assert.doesNotMatch(css, /Hokkien/);
+
+assert.match(css, /\.system-board\s*\{/);
+assert.match(css, /\.front-screen-preview\s*\{/);
+assert.match(css, /\.front-screen-label\s*\{/);
+assert.doesNotMatch(css, /\.front-copy/);
+assert.doesNotMatch(css, /\.side-note/);
+assert.match(css, /\.tablet-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*1fr\)/s);
+assert.match(css, /\.tablet-preview-label\s*\{/);
+assert.match(css, /\.tablet-slide-card\s*\{/);
+assert.match(css, /\.tablet-slide-card img\s*\{[^}]*aspect-ratio:\s*16 \/ 9/s);
+assert.doesNotMatch(css, /\.table-card/);
+assert.doesNotMatch(css, /\.status/);
+assert.doesNotMatch(css, /\.wide-soft/);
+assert.doesNotMatch(css, /\.language-pills/);
+assert.match(css, /\.phone-shell\s*\{[^}]*border:\s*1px solid #050607/s);
+assert.match(css, /\.phone-shell\s*\{[^}]*background:\s*transparent/s);
+assert.match(css, /\.phone-speaker\s*\{[^}]*height:\s*6px/s);
+assert.match(css, /\.screen-body\s*\{[^}]*scrollbar-gutter:\s*stable/s);
+assert.match(css, /\.screen-body\s*\{[^}]*scrollbar-width:\s*thin/s);
+assert.match(css, /\.screen-body\s*\{[^}]*scrollbar-color:\s*transparent transparent/s);
+assert.match(css, /\.screen-body::-webkit-scrollbar\s*\{[^}]*width:\s*6px/s);
+assert.match(css, /\.screen-body::-webkit-scrollbar-thumb\s*\{[^}]*background:\s*transparent/s);
+assert.match(css, /\.phone-screen:hover \.screen-body\s*\{[^}]*scrollbar-width:\s*thin/s);
+assert.match(css, /\.phone-screen:hover \.screen-body\s*\{[^}]*scrollbar-color:\s*rgba\(22,\s*25,\s*29,\s*0\.32\) transparent/s);
+assert.match(css, /\.phone-screen:hover \.screen-body::-webkit-scrollbar-thumb\s*\{[^}]*background:\s*rgba\(22,\s*25,\s*29,\s*0\.32\)/s);
+assert.match(css, /\.screen-body\s*\{[^}]*overflow-x:\s*hidden/s);
+assert.match(css, /\.screen-panel\s*\{[^}]*will-change:\s*transform,\s*opacity/s);
+assert.match(css, /\.current-step \.button-row,\s*\.tablet-nav-row\s*\{[^}]*justify-content:\s*center/s);
+
+assert.match(mobileCss, /\.system-board\s*\{[^}]*display:\s*none/s);
+assert.match(mobileCss, /\.phone-shell\s*\{[^}]*width:\s*100vw/s);
+assert.match(mobileCss, /\.phone-shell\s*\{[^}]*height:\s*100dvh/s);
+assert.match(mobileCss, /\.phone-shell\s*\{[^}]*border:\s*0/s);
+assert.match(mobileCss, /\.phone-screen\s*\{[^}]*border-radius:\s*0/s);
+
+console.log("PacePal system layout checks passed");
