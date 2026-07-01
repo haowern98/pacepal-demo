@@ -160,18 +160,10 @@ button {
   box-shadow: 0 24px 80px rgba(22, 25, 29, 0.16);
 }
 
-.phone-speaker {
-  width: 72px;
-  height: 6px;
-  margin: 0 auto 8px;
-  border-radius: 999px;
-  background: rgba(22, 25, 29, 0.28);
-}
-
 .phone-screen {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 32px);
+  height: 100%;
   overflow: hidden;
   border-radius: 32px;
   background:
@@ -456,10 +448,6 @@ h3 {
     padding: 0;
     background: transparent;
     box-shadow: none;
-  }
-
-  .phone-speaker {
-    display: none;
   }
 
   .phone-screen {

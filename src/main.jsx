@@ -127,7 +127,6 @@ function PhoneController({ state, setState }) {
   return (
     <section className="phone-wrap" aria-label="Volunteer phone app">
       <div className="phone-shell">
-        <div className="phone-speaker" aria-hidden="true" />
         <div className="phone-screen">
           <header className="app-header">
             <div>
