@@ -333,6 +333,51 @@ button {
   line-height: 1.35;
 }
 
+.table-status {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.table-status .kicker {
+  margin-bottom: 0;
+  color: var(--teal);
+}
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-choice {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.status-choice.needs-help.selected {
+  border-color: var(--coral);
+  background: var(--coral);
+  color: #fffdf8;
+}
+
+.status-choice.on-track.selected {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fffdf8;
+}
+
+.status-choice.fast.selected {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--ink);
+}
+
 .current-step .button-row {
   margin-top: auto;
 }

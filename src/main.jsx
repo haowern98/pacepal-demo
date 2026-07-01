@@ -45,6 +45,12 @@ function mutate(setState, action) {
   });
 }
 
+const tableStatuses = [
+  { id: "needs-help", label: "Needs help" },
+  { id: "on-track", label: "On track" },
+  { id: "fast", label: "Fast" },
+];
+
 function App() {
   const [state, setState] = useState(createInitialState);
   const stageRef = useRef(null);
@@ -197,6 +203,21 @@ function TablesScreen({ state, setState }) {
         </div>
         <img className="phone-slide-image" src={step.slideImage} alt={`${table.name} actual slide`} />
         <small>{step.cue}</small>
+        <div className="table-status">
+          <p className="kicker">Table status</p>
+          <div className="status-row">
+            {tableStatuses.map((status) => (
+              <button
+                key={status.id}
+                type="button"
+                className={`status-choice ${status.id} ${table.status === status.id ? "selected" : ""}`}
+                onClick={() => mutate(setState, (draft) => updateTable(draft, table.id, status.id))}
+              >
+                {status.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="button-row">
           <button type="button" onClick={() => mutate(setState, previousTableStep)}>Last slide</button>
           <button type="button" className="primary" onClick={() => mutate(setState, advanceTableStep)}>Next slide</button>
