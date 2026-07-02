@@ -266,10 +266,7 @@ function SlideControlScreen({ state, setState }) {
 function HelpScreen({ state, setState, queue }) {
   return (
     <section className="screen-stack">
-      <div className="screen-title">
-        <p className="kicker">Help queue</p>
-        <h2>Quiet requests and fast-finisher prompts.</h2>
-      </div>
+      <p className="kicker">Help queue</p>
       {queue.length ? queue.map((table) => (
         <div className="app-card queue-card" key={table.id}>
           <span>{table.name}</span>
@@ -279,12 +276,6 @@ function HelpScreen({ state, setState, queue }) {
           </button>
         </div>
       )) : <div className="app-card"><p>No help requests right now.</p></div>}
-      <div className="app-card">
-        <p className="kicker">Fast finishers</p>
-        <ul className="task-list">
-          {state.activity.fastTasks.map((task) => <li key={task}>{task}</li>)}
-        </ul>
-      </div>
     </section>
   );
 }
