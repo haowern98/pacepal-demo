@@ -64,6 +64,7 @@ assert.deepEqual(state.reflections, ["Tablet screens helped slower seniors stay 
 const css = readFileSync("src/styles.css", "utf8");
 const mobileCss = css.slice(css.indexOf("@media (max-width: 900px)"));
 const main = readFileSync("src/main.jsx", "utf8");
+const phoneHeaderSource = main.slice(main.indexOf("<header className=\"app-header\">"), main.indexOf("<nav className=\"tab-bar four-tabs\""));
 const tablesScreenSource = main.slice(main.indexOf("function TablesScreen"), main.indexOf("function SlideControlScreen"));
 const slideScreenSource = main.slice(main.indexOf("function SlideControlScreen"), main.indexOf("function HelpScreen"));
 
@@ -87,6 +88,8 @@ assert.match(main, /front-screen-label/);
 assert.match(main, /tablet-preview-label/);
 assert.match(main, /tablet-slide-card/);
 assert.match(main, /aria-label=\{`\$\{table\.name\} slide preview`\}/);
+assert.doesNotMatch(phoneHeaderSource, /Helped/);
+assert.doesNotMatch(phoneHeaderSource, /updateTable\(draft, table\.id, "helped"\)/);
 assert.match(tablesScreenSource, /follow-list/);
 assert.match(tablesScreenSource, /Front screen follow status/);
 assert.match(tablesScreenSource, /current-step/);

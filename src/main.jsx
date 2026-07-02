@@ -111,7 +111,6 @@ function TableTabletGrid({ state, setState }) {
 
 function PhoneController({ state, setState }) {
   const queue = helpQueue(state);
-  const table = selectedTable(state);
   const screenBodyRef = useRef(null);
   const screenPanelRef = useRef(null);
   const previousTabRef = useRef(state.activeTab);
@@ -139,9 +138,6 @@ function PhoneController({ state, setState }) {
               <span>Fei Yue AAC</span>
               <strong>{state.activeActivity}</strong>
             </div>
-            <button type="button" onClick={() => mutate(setState, (draft) => updateTable(draft, table.id, "helped"))}>
-              Helped
-            </button>
           </header>
 
           <nav className="tab-bar four-tabs" aria-label="Volunteer screens">
