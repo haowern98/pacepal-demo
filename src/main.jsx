@@ -218,6 +218,20 @@ function TablesScreen({ state, setState }) {
             ))}
           </div>
         </div>
+        {table.status === "needs-help" && (
+          <label className="help-remark">
+            <span className="kicker">Help remark</span>
+            <input
+              type="text"
+              value={table.note}
+              placeholder="String tip too soft"
+              onChange={(event) => mutate(setState, (draft) => {
+                const draftTable = draft.tables.find((item) => item.id === table.id);
+                if (draftTable) draftTable.note = event.target.value;
+              })}
+            />
+          </label>
+        )}
         <div className="button-row">
           <button type="button" onClick={() => mutate(setState, previousTableStep)}>Last slide</button>
           <button type="button" className="primary" onClick={() => mutate(setState, advanceTableStep)}>Next slide</button>

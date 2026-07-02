@@ -31,6 +31,7 @@ body {
 }
 
 button,
+input,
 textarea {
   font: inherit;
 }
@@ -376,6 +377,28 @@ button {
   border-color: var(--gold);
   background: var(--gold);
   color: var(--ink);
+}
+
+.help-remark {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.help-remark .kicker {
+  margin-bottom: 0;
+  color: var(--teal);
+}
+
+.help-remark input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .current-step .button-row {
